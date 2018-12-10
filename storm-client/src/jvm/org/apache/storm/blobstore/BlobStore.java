@@ -288,13 +288,15 @@ public abstract class BlobStore implements Shutdownable, AutoCloseable {
             while ((len = in.read(buffer)) > 0) {
                 out.write(buffer, 0, len);
             }
-            out.close();
-        } catch (AuthorizationException | IOException | RuntimeException e) {
-            if (out != null) {
-                out.cancel();
-            }
         } finally {
-            in.close();
+            try {
+                if (out != null) {
+                    out.cancel();
+                }
+                in.close();
+            } catch (IOException throwaway) {
+                // Ignored
+            }
         }
     }
 
